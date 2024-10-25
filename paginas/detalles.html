@@ -1,0 +1,133 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./../css/bootstrap.min.css" rel="stylesheet"> 
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Navbar</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="home.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="nuevoPersonaje.html">Crear personaje</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Series
+                </a>
+                <ul class="dropdown-menu" id="series">
+                  
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+              </li>
+            </ul>
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+      <button><a href="home.html">Volver</a></button>
+      <div id="imagen">
+            
+      </div>
+      <div >
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Puntacion</th>
+                    <th>año</th>
+                </tr>
+            </thead>
+            <tbody id="datos">
+
+            </tbody>
+        </table>
+        <table id="personajesSerie">
+            
+            
+        </table>
+
+      </div>
+    
+</body>
+<script src="./../js/jquery-3.7.1.js"></script>
+<script src="./../js/bootstrap.bundle.js"></script>
+<script>
+    $(document).ready(function(){
+         var params = new window.URLSearchParams(window.location.search)
+         var id = params.get('idserie');
+        cargarSeries();
+          let api ="https://apiseriespersonajes.azurewebsites.net/"
+         let request = "api/Series/"+id
+         console.log(api+request)
+         let url1 = api+request
+         let url = url1
+            $.ajax({
+                url:url,
+                type: "GET",
+                contentType: "application/json",
+                success:function(data){
+                    let imagen="<img src="+data.imagen+" width='30%'/>"
+                    let contenido = "<tr><td>"+data.nombre+"</td><td>"+data.puntuacion+"</td><td>"+data.anyo+"</td><td><button><a onclick='cargarPersonajes()'>Personajes</a></button></td></tr>"
+                    $("#imagen").html(imagen)
+                    $("#datos").html(contenido)
+                } 
+            })
+    })
+   function cargarPersonajes(){
+    var params = new window.URLSearchParams(window.location.search)
+    var id = params.get('idserie');
+     let api ="https://apiseriespersonajes.azurewebsites.net/"
+     let request = "api/Series/PersonajesSerie/"+id
+     let personajes ="";
+     $.ajax({
+        url: api+request,
+        type: "GET",
+        contentType: "application/json",
+        success: function(data){
+            $.each(data, function(index,persona){{
+                console.log(persona.nombre)
+                 personajes += "<thead><tr><td>nombre</td><td>imagen</td></tr></thead><tbody><tr><td>"+persona.nombre+"</td><td><img src='"+persona.imagen+"' width='30%'/>s</td></tr></tbody></table";
+            }})
+            
+           
+            $("#personajesSerie").html(personajes);
+            console.log(personajes);
+        }
+
+     }) 
+
+   }
+    function cargarSeries(){
+        let api ="https://apiseriespersonajes.azurewebsites.net/"
+        let request = "/api/Series"
+        let global = api+request
+        $.ajax({
+            url:global,
+            type: "GET",
+            contentType: "application/json",
+            success:function(data){
+                let html =""
+                $.each(data,function(index,serie){
+                    html += "<li><a href='./detalles.html?idserie="+serie.idSerie+"'>"+serie.nombre+"</a></li>"
+                })
+                $("#series").html(html)
+            }
+        })
+    }
+</script>
+</html>
